@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
 		mcp_server_file_systems_prompts_requirements.txt = mcp_server_file_systems_prompts_requirements.txt
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
@@ -49,5 +50,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6B99A9B2-9D72-49AE-9FB8-978732F65FB9}
 	EndGlobalSection
 EndGlobal
