@@ -1,6 +1,9 @@
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 
+const string PromptsDirectory = "Prompts";
+const string PromptExtension = ".prompt.md";
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMcpServer()
@@ -14,11 +17,10 @@ app.Run();
 
 static ValueTask<ListPromptsResult> ListPromptsHandler(RequestContext<ListPromptsRequestParams> context, CancellationToken cancellationToken)
 {
-    var rootDir = "Prompts";
-    var promptFiles = Directory.GetFiles(rootDir, "*.prompt.md", SearchOption.AllDirectories);
+    var promptFiles = Directory.GetFiles(PromptsDirectory, $"*{PromptExtension}", SearchOption.AllDirectories);
     var prompts = promptFiles.Select(file =>
     {
-        var relativePath = Path.GetRelativePath(rootDir, file);
+        var relativePath = Path.GetRelativePath(PromptsDirectory, file);
         var name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(relativePath)).Replace("\\", "/");
         return new Prompt { Name = name, Description = $"Prompt from {relativePath}" };
     }).ToList();
@@ -27,11 +29,10 @@ static ValueTask<ListPromptsResult> ListPromptsHandler(RequestContext<ListPrompt
 
 static async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromptRequestParams> context, CancellationToken cancellationToken)
 {
-    var rootDir = "Prompts";
     var promptName = context.Params?.Name?.Replace('/', Path.DirectorySeparatorChar) ?? "";
-    if (!promptName.EndsWith(".prompt.md", StringComparison.OrdinalIgnoreCase))
-        promptName += ".prompt.md";
-    var filePath = Path.Combine(rootDir, promptName);
+    if (!promptName.EndsWith(PromptExtension, StringComparison.OrdinalIgnoreCase))
+        promptName += PromptExtension;
+    var filePath = Path.Combine(PromptsDirectory, promptName);
     if (!File.Exists(filePath))
         throw new FileNotFoundException($"Prompt file not found: {filePath}");
     var content = await File.ReadAllTextAsync(filePath, cancellationToken);
