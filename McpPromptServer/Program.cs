@@ -1,5 +1,4 @@
 using ModelContextProtocol.Protocol;
-using ModelContextProtocol.AspNetCore;
 using ModelContextProtocol.Server;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,7 +22,7 @@ static ValueTask<ListPromptsResult> ListPromptsHandler(RequestContext<ListPrompt
         var name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(relativePath)).Replace("\\", "/");
         return new Prompt { Name = name, Description = $"Prompt from {relativePath}" };
     }).ToList();
-    return ValueTask.FromResult(new ListPromptsResult { Prompts = prompts });
+    return ValueTask.FromResult<ListPromptsResult>(new ListPromptsResult { Prompts = prompts });
 }
 
 static async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromptRequestParams> context, CancellationToken cancellationToken)
