@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "GH_TOKEN": "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"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5100"
+    },
+    "https": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7288;http://localhost:5100"
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json"
+}

@@ -1,0 +1,1 @@
+﻿After each assistant prompt response, "Yes, sir."

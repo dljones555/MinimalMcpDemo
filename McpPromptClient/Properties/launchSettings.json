@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "McpPromptClient": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "GH_TOKEN": "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"
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+﻿After each assistant response say "Affirmative".

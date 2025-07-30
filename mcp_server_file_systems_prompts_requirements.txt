@@ -1,0 +1,54 @@
+MCP Prompt Server Requirements
+1.	Prompt Discovery
+•	The server must recursively scan a configurable directory (default: Prompts/) for files matching *.prompt.md.
+•	Each prompt is identified by its relative path (excluding .prompt.md), using / as a separator (e.g., Sales/Inbound/salesrep).
+•	Each prompt must have a name and a description (description can be auto-generated from the file path).
+2.	Prompt Listing API
+•	The server must expose an MCP-compatible endpoint to list all available prompts.
+•	The response must include the prompt name and description for each prompt.
+3.	Prompt Retrieval API
+•	The server must expose an MCP-compatible endpoint to fetch the full content of a prompt by name.
+•	If the prompt does not exist, the server must return a clear error.
+4.	Prompt Content
+•	Prompt content is returned as a single assistant message (role: assistant, content: text).
+•	The server must trim whitespace from the prompt content.
+5.	Extensibility
+•	The server must be easy to extend with additional tools, resources, or authentication if needed.
+•	Logging and error handling should be present for prompt discovery and retrieval.
+---
+MCP Chat Client with Prompt Attachment and Chat Loop Requirements
+1.	MCP Prompt Integration
+•	The client must connect to the MCP prompt server and support listing and fetching prompts.
+•	The client must support commands:
+•	/listprompts — lists all available prompts.
+•	/getprompt [name] — fetches and displays the content of the specified prompt.
+2.	Prompt Attachment
+•	The client must allow the user to attach a prompt to the chat context.
+•	When a prompt is attached, its content is prepended to the chat history as a system or assistant message for all subsequent LLM completions.
+•	The client must support a command to attach a prompt (e.g., /attachprompt [name]).
+•	The client must support a command to detach the prompt (e.g., /detachprompt).
+3.	Chat Loop
+•	The client must support an interactive chat loop:
+•	User enters a message or command.
+•	If it’s a command, the client executes it.
+•	If it’s a message, the client sends the chat history (including the attached prompt, if any) to the LLM API and displays the assistant’s response.
+•	The chat history must include all user and assistant messages, and the attached prompt (if any) as the first message.
+4.	LLM API Integration
+•	The client must send chat history to a configurable LLM API endpoint (e.g., GitHub Models inference API).
+•	The client must use a Bearer token (e.g., GH_TOKEN) for authentication.
+•	The client must handle and display errors from the LLM API.
+5.	User Experience
+•	The client must clearly display available commands and their usage.
+•	The client must display prompt content when fetched or attached.
+•	The client must display assistant responses in a readable format.
+6.	Extensibility
+•	The client must be easy to extend with additional commands, prompt management features, or LLM providers.
+---
+Example Command Flow
+
+
+/listprompts
+/attachprompt Sales/Inbound/salesrep
+Hello, what should I say to a new customer?
+/detachprompt
+/getprompt Sales/Outbound/followup
