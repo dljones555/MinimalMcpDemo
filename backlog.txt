@@ -1,0 +1,24 @@
+The real POC / MVP
+- Full life cycle prompt ops w/ evals & non-engineers
+- Testing by non-engineers w/ prompt selection
+- Prompt chaining where one is tweeked: instructions, examples, output formats
+Versioning
+Use PromptLoader in C#
+Use a roots json file
+Implement in python
+HTTP prompt sources
+- langchain hub
+- github models
+- azure prompt studio (or whichever product)
+- aws converse
+- promptlayer
+- etc
+- must prioritize
+Support S3 bucket
+Support Azure Blog storage
+Spike MCP resources
+Spike MCP roots
+MCP prompt requestparams
+Prompt templates
+Prompt functions
+

@@ -1,0 +1,37 @@
+1. Separation of Concerns and Extensibility
+•	Server and client are cleanly separated: The server is responsible for prompt discovery and serving, while the client handles prompt selection and chat orchestration.
+•	Extensible architecture: Both server and client are easy to extend (e.g., add prompt arguments, authentication, new LLM providers, or new prompt sources like HTTP/cloud).
+---
+2. Prompt Management via File System
+•	Prompts as files: Using the file system for prompt management is simple, transparent, and version-control friendly.
+•	Relative path naming: Prompts are named by their relative path, supporting logical grouping and easy navigation.
+•	Auto-discovery: The server auto-discovers prompts, so adding/removing prompts is as easy as adding/removing files.
+---
+3. MCP Protocol as a Prompt API
+•	Protocol abstraction: MCP provides a clean, language-agnostic API for prompt listing and retrieval, making it easy to swap out the backend or integrate with other tools.
+•	Prompt content is not limited to static text: The protocol supports templates and function-backed prompts, enabling dynamic, parameterized, or computed prompt content.
+---
+4. Client Command Pattern
+•	Command-driven UX: The client supports commands like /listprompts and /getprompt [name], making it easy to interactively browse and use prompts.
+•	Prompt attachment (if implemented): The ability to attach a prompt to the chat context is powerful for LLM-driven workflows.
+---
+5. Async, Modern .NET Patterns
+•	Async/await everywhere: All I/O is non-blocking, making the client and server scalable and responsive.
+•	Modern HttpClient usage: Uses PostAsJsonAsync and ReadFromJsonAsync for clean, idiomatic HTTP calls.
+---
+6. Novel/Advanced Takeaways
+•	Function-backed prompts: The MCP toolkit allows prompts to be implemented as code (functions), not just static files. This enables dynamic, context-aware, or API-driven prompt content.
+•	Prompt arguments and templating: The protocol supports parameterized prompts, so you can build prompts that take user input or context variables.
+•	DI and service injection: Function-backed prompts can leverage dependency injection, making them powerful for enterprise scenarios.
+•	Multi-modal prompt content: The protocol supports not just text, but also images, audio, and more (via content blocks).
+---
+7. Developer Experience
+•	Minimal ceremony: The prototype is easy to set up, run, and extend—ideal for rapid prototyping and experimentation.
+•	Copilot/VS Code friendly: The code structure and patterns are easy for Copilot to understand and extend, reducing developer friction.
+---
+Summary Table
+| Takeaway                        | Why It Matters                                      | |----------------------------------|-----------------------------------------------------| | File-based prompt management     | Simple, transparent, versionable                    | | Protocol abstraction (MCP)       | Language-agnostic, swappable backend                | | Async/modern .NET patterns       | Scalable, maintainable, future-proof                | | Function-backed prompts          | Dynamic, context-aware, programmable prompts         | | Prompt arguments/templates       | Parameterized, reusable, user-driven prompts        | | Command-driven client UX         | Interactive, scriptable, easy to automate           | | Extensible architecture          | Easy to add auth, new LLMs, new prompt sources      |
+---
+Novel insight:
+The combination of file-based prompt management, protocol-driven APIs, and function-backed dynamic prompts gives you a uniquely flexible and powerful foundation for LLM-driven applications—one that is easy to prototype, test, and scale.
+Let me know if you want to see a specific advanced pattern (e.g., prompt arguments, DI in prompts, or multi-modal content) in code!
