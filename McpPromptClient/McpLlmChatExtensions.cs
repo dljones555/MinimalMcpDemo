@@ -23,13 +23,20 @@ public static class McpLlmChatClientExtensions
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", llm.ApiKey);
 
-        Console.WriteLine("Type /listprompts or /getprompt [name] to fetch a prompt. Type /exit to quit.");
+        Console.WriteLine("Type /resources, /listprompts or /getprompt [name] to fetch a prompt. Type /exit to quit.");
         while (true)
         {
             Console.Write("> ");
             var input = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(input)) continue;
 
+            if (input.StartsWith("/resources", StringComparison.OrdinalIgnoreCase) && llm.McpClient != null)
+            {
+                var resources = await llm.McpClient.ListResourcesAsync();
+                foreach (var r in resources)
+                    Console.WriteLine($"{r.Name} - {r.Description}");
+                continue;
+            }
             if (input.StartsWith("/listprompts", StringComparison.OrdinalIgnoreCase) && llm.McpClient != null)
             {
                 

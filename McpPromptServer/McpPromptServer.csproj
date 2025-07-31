@@ -13,10 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Prompts\prompt_test_a.prompt.md">
+    <None Update="Prompts\CustomerService\prompt_test_a.prompt.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Prompts\prompt_test_b.prompt.md">
+    <None Update="Prompts\Sales\prompt_test_b.prompt.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

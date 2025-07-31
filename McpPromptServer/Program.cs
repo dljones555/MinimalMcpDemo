@@ -9,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMcpServer()
     .WithHttpTransport()
     .WithListPromptsHandler(ListPromptsHandler)
-    .WithGetPromptHandler(GetPromptHandler);
+    .WithGetPromptHandler(GetPromptHandler)
+    .WithListResourcesHandler(ListResourcesHandler); // Register resource handler
 
 var app = builder.Build();
 app.MapMcp();
@@ -47,4 +48,27 @@ static async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromp
             }
         }
     };
+}
+
+// New: ListResourcesHandler implementation
+static ValueTask<ListResourcesResult> ListResourcesHandler(RequestContext<ListResourcesRequestParams> context, CancellationToken cancellationToken)
+{
+    // List first-level directories under PromptsDirectory as resources
+    var resourceDirs = Directory.Exists(PromptsDirectory)
+        ? Directory.GetDirectories(PromptsDirectory)
+        : Array.Empty<string>();
+
+    var resources = resourceDirs
+        .Select(dir => {
+            var name = Path.GetFileName(dir);
+            return new Resource
+            {
+                Name = name,
+                Description = $"Prompt set: {name}",
+                Uri = $"/{name}" // Required by MCP spec and SDK
+            };
+        })
+        .ToList();
+
+    return ValueTask.FromResult(new ListResourcesResult { Resources = resources });
 }
