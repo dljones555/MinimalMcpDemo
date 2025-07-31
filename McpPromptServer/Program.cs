@@ -18,22 +18,39 @@ app.Run();
 
 static ValueTask<ListPromptsResult> ListPromptsHandler(RequestContext<ListPromptsRequestParams> context, CancellationToken cancellationToken)
 {
+    // Parse root from prompt name prefix if present in the prompt name
+    var prompts = new List<Prompt>();
     var promptFiles = Directory.GetFiles(PromptsDirectory, $"*{PromptExtension}", SearchOption.AllDirectories);
-    var prompts = promptFiles.Select(file =>
+    foreach (var file in promptFiles)
     {
         var relativePath = Path.GetRelativePath(PromptsDirectory, file);
         var name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(relativePath)).Replace("\\", "/");
-        return new Prompt { Name = name, Description = $"Prompt from {relativePath}" };
-    }).ToList();
-    return ValueTask.FromResult<ListPromptsResult>(new ListPromptsResult { Prompts = prompts });
+        var folder = Path.GetDirectoryName(relativePath)?.Replace("\\", "/");
+        if (!string.IsNullOrWhiteSpace(folder))
+            name = folder + "/" + name;
+        prompts.Add(new Prompt { Name = name, Description = $"Prompt from {relativePath}" });
+    }
+    return ValueTask.FromResult(new ListPromptsResult { Prompts = prompts });
 }
 
 static async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromptRequestParams> context, CancellationToken cancellationToken)
 {
-    var promptName = context.Params?.Name?.Replace('/', Path.DirectorySeparatorChar) ?? "";
-    if (!promptName.EndsWith(PromptExtension, StringComparison.OrdinalIgnoreCase))
-        promptName += PromptExtension;
-    var filePath = Path.Combine(PromptsDirectory, promptName);
+    // Parse root from prompt name prefix if present
+    var promptName = context.Params?.Name ?? "";
+    string filePath;
+    var parts = promptName.Split(new[] {'/', '\\'}, 2);
+    if (parts.Length == 2 && Directory.Exists(Path.Combine(PromptsDirectory, parts[0])))
+    {
+        // Treat first part as root
+        var rootDir = Path.Combine(PromptsDirectory, parts[0]);
+        filePath = Path.Combine(rootDir, parts[1]);
+    }
+    else
+    {
+        filePath = Path.Combine(PromptsDirectory, promptName);
+    }
+    if (!filePath.EndsWith(PromptExtension, StringComparison.OrdinalIgnoreCase))
+        filePath += PromptExtension;
     if (!File.Exists(filePath))
         throw new FileNotFoundException($"Prompt file not found: {filePath}");
     var content = await File.ReadAllTextAsync(filePath, cancellationToken);

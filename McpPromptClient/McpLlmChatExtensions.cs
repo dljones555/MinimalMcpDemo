@@ -23,7 +23,7 @@ public static class McpLlmChatClientExtensions
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", llm.ApiKey);
 
-        Console.WriteLine("Type /resources, /listprompts or /getprompt [name] to fetch a prompt. Type /exit to quit.");
+        Console.WriteLine("Type /resources, /root [name], /listprompts or /getprompt [name] to fetch a prompt. Type /exit to quit.");
         while (true)
         {
             Console.Write("> ");
@@ -37,18 +37,26 @@ public static class McpLlmChatClientExtensions
                     Console.WriteLine($"{r.Name} - {r.Description}");
                 continue;
             }
+            if (input.StartsWith("/root ", StringComparison.OrdinalIgnoreCase))
+            {
+                var rootName = input.Substring("/root ".Length).Trim();
+                llm.CurrentRoot = string.IsNullOrWhiteSpace(rootName) ? null : rootName;
+                Console.WriteLine(llm.CurrentRoot == null ? "Root cleared. Listing all prompts." : $"Root set to: {llm.CurrentRoot}");
+                continue;
+            }
             if (input.StartsWith("/listprompts", StringComparison.OrdinalIgnoreCase) && llm.McpClient != null)
             {
-                
                 var prompts = await llm.McpClient.ListPromptsAsync();
                 foreach (var p in prompts)
-                    Console.WriteLine($"{p.Name} - {p.Description}");
+                    if (llm.CurrentRoot == null || p.Name.StartsWith(llm.CurrentRoot + "/"))
+                        Console.WriteLine($"{p.Name} - {p.Description}");
                 continue;
             }
             if (input.StartsWith("/getprompt ", StringComparison.OrdinalIgnoreCase) && llm.McpClient != null)
             {
                 var name = input.Substring("/getprompt ".Length).Trim();
-                var result = await llm.McpClient.GetPromptAsync(name);
+                var fullName = llm.CurrentRoot != null && !name.StartsWith(llm.CurrentRoot + "/") ? $"{llm.CurrentRoot}/{name}" : name;
+                var result = await llm.McpClient.GetPromptAsync(fullName);
                 var promptText = result.Messages.FirstOrDefault() is { Content: TextContentBlock tcb } ? tcb.Text : null;
                 Console.WriteLine($"\nPrompt Content:\n{promptText}");
                 llm.ChatHistory.Clear();
@@ -111,11 +119,13 @@ public class LlmChatClient
     public string Model { get; }
     public IMcpClient? McpClient { get; set; }
     public List<Dictionary<string, string>> ChatHistory { get; } = new();
+    public string? CurrentRoot { get; set; } // Property for current root
 
-    public LlmChatClient(string llmEndpoint, string apiKey, string model = "gpt-4o")
+    public LlmChatClient(string llmEndpoint, string apiKey, string model = "gpt-4o", string? initialRoot = null)
     {
         LlmEndpoint = llmEndpoint;
         ApiKey = apiKey;
         Model = model;
+        CurrentRoot = initialRoot; // Default to null (no root)
     }
 }
