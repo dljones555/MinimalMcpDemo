@@ -1,6 +1,6 @@
 The real POC / MVP
 - Full life cycle prompt ops w/ evals & non-engineers
-- Testing by non-engineers w/ prompt selection
+- Testing by non-engineers w/ prompt evaluation
 - Prompt chaining where one is tweeked: instructions, examples, output formats
 Versioning
 Use PromptLoader in C#
@@ -8,8 +8,9 @@ Use a roots json file
 Implement in python
 HTTP prompt sources
 - langchain hub
+- github
 - github models
-- azure prompt studio (or whichever product)
+- azure promptflow (or whichever product)
 - aws converse
 - promptlayer
 - etc

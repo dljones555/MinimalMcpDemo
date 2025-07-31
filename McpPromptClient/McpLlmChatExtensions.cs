@@ -14,6 +14,7 @@ public static class McpLlmChatClientExtensions
         };
         var httpClient = new HttpClient();
         llm.McpClient = await McpClientFactory.CreateAsync(new SseClientTransport(options, httpClient));
+       
         return llm;
     }
 
@@ -31,6 +32,7 @@ public static class McpLlmChatClientExtensions
 
             if (input.StartsWith("/listprompts", StringComparison.OrdinalIgnoreCase) && llm.McpClient != null)
             {
+                
                 var prompts = await llm.McpClient.ListPromptsAsync();
                 foreach (var p in prompts)
                     Console.WriteLine($"{p.Name} - {p.Description}");
