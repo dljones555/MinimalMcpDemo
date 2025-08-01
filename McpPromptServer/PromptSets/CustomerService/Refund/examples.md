@@ -1,0 +1,1 @@
+﻿This is a refund request for a recent purchase. The customer is unhappy with the product and wants to return it for a full refund. Please process the refund according to company policy and provide a confirmation to the customer.

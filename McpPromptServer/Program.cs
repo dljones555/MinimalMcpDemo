@@ -1,8 +1,17 @@
 using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
+using PromptLoader.Fluent;
+using Microsoft.Extensions.Configuration;
 
 const string PromptsDirectory = "Prompts";
-const string PromptExtension = ".prompt.md";
+
+var config = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables()
+    .Build();
+
+var promptContext = new PromptContext().WithConfig(config);
+await promptContext.LoadAsync();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,50 +19,40 @@ builder.Services.AddMcpServer()
     .WithHttpTransport()
     .WithListPromptsHandler(ListPromptsHandler)
     .WithGetPromptHandler(GetPromptHandler)
-    .WithListResourcesHandler(ListResourcesHandler); // Register resource handler
+    .WithListResourcesHandler(ListResourcesHandler);
 
 var app = builder.Build();
 app.MapMcp();
 app.Run();
 
-static ValueTask<ListPromptsResult> ListPromptsHandler(RequestContext<ListPromptsRequestParams> context, CancellationToken cancellationToken)
+ValueTask<ListPromptsResult> ListPromptsHandler(RequestContext<ListPromptsRequestParams> context, CancellationToken cancellationToken)
 {
-    // Parse root from prompt name prefix if present in the prompt name
+    // List all prompts in all sets, flattening to MCP Prompt type
     var prompts = new List<Prompt>();
-    var promptFiles = Directory.GetFiles(PromptsDirectory, $"*{PromptExtension}", SearchOption.AllDirectories);
-    foreach (var file in promptFiles)
+    foreach (var set in promptContext.PromptSets)
     {
-        var relativePath = Path.GetRelativePath(PromptsDirectory, file);
-        var name = Path.GetFileNameWithoutExtension(Path.GetFileNameWithoutExtension(relativePath)).Replace("\\", "/");
-        var folder = Path.GetDirectoryName(relativePath)?.Replace("\\", "/");
-        if (!string.IsNullOrWhiteSpace(folder))
-            name = folder + "/" + name;
-        prompts.Add(new Prompt { Name = name, Description = $"Prompt from {relativePath}" });
+        foreach (var subset in set.Value)
+        {
+            foreach (var promptKvp in subset.Value.Prompts)
+            {
+                prompts.Add(new Prompt
+                {
+                    Name = (set.Key == "Root" ? "" : set.Key + "/") + (subset.Key == "Root" ? "" : subset.Key + "/") + promptKvp.Key,
+                    Description = $"Prompt from set {set.Key}, subset {subset.Key}, file {promptKvp.Key}"
+                });
+            }
+        }
     }
     return ValueTask.FromResult(new ListPromptsResult { Prompts = prompts });
 }
 
-static async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromptRequestParams> context, CancellationToken cancellationToken)
+async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromptRequestParams> context, CancellationToken cancellationToken)
 {
-    // Parse root from prompt name prefix if present
-    var promptName = context.Params?.Name ?? "";
-    string filePath;
-    var parts = promptName.Split(new[] {'/', '\\'}, 2);
-    if (parts.Length == 2 && Directory.Exists(Path.Combine(PromptsDirectory, parts[0])))
-    {
-        // Treat first part as root
-        var rootDir = Path.Combine(PromptsDirectory, parts[0]);
-        filePath = Path.Combine(rootDir, parts[1]);
-    }
-    else
-    {
-        filePath = Path.Combine(PromptsDirectory, promptName);
-    }
-    if (!filePath.EndsWith(PromptExtension, StringComparison.OrdinalIgnoreCase))
-        filePath += PromptExtension;
-    if (!File.Exists(filePath))
-        throw new FileNotFoundException($"Prompt file not found: {filePath}");
-    var content = await File.ReadAllTextAsync(filePath, cancellationToken);
+    // Use fluent PromptContext API for elegant prompt retrieval
+    var name = context.Params?.Name ?? "";
+    var promptString = promptContext.Get(name).AsString();
+    if (string.IsNullOrWhiteSpace(promptString))
+        throw new FileNotFoundException($"Prompt not found: {name}");
     return new GetPromptResult
     {
         Messages = new[]
@@ -61,31 +60,22 @@ static async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromp
             new PromptMessage
             {
                 Role = Role.Assistant,
-                Content = new TextContentBlock { Text = content.Trim() }
+                Content = new TextContentBlock { Text = promptString.Trim() }
             }
         }
     };
 }
 
-// New: ListResourcesHandler implementation
-static ValueTask<ListResourcesResult> ListResourcesHandler(RequestContext<ListResourcesRequestParams> context, CancellationToken cancellationToken)
+ValueTask<ListResourcesResult> ListResourcesHandler(RequestContext<ListResourcesRequestParams> context, CancellationToken cancellationToken)
 {
-    // List first-level directories under PromptsDirectory as resources
-    var resourceDirs = Directory.Exists(PromptsDirectory)
-        ? Directory.GetDirectories(PromptsDirectory)
-        : Array.Empty<string>();
-
-    var resources = resourceDirs
-        .Select(dir => {
-            var name = Path.GetFileName(dir);
-            return new Resource
-            {
-                Name = name,
-                Description = $"Prompt set: {name}",
-                Uri = $"/{name}" // Required by MCP spec and SDK
-            };
-        })
-        .ToList();
-
+    // List top-level sets as resources
+    var resources = promptContext.PromptSets.Keys
+        .Where(k => k != "Root")
+        .Select(root => new Resource
+        {
+            Name = root,
+            Description = $"Prompt set: {root}",
+            Uri = $"/{root}"
+        }).ToList();
     return ValueTask.FromResult(new ListResourcesResult { Resources = resources });
 }
