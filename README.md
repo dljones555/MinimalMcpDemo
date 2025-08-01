@@ -19,15 +19,18 @@ A minimal end-to-end demo for the [Model Context Protocol (MCP)](https://github.
 
 - **PromptLoader**:  
   A reusable library for loading, organizing, and composing prompts.  
-  - **Fluent API:** Easily load prompts from folders/files, combine/chains prompts, and apply configuration in a readable style:```csharp
-var ctx = await PromptContext
-    .FromFolder()
-    .WithConfig(config)
-    .LoadAsync();
-string combined = ctx.Get("Sales").CombineWithRoot().AsString();
-```  - **Configurable via appsettings.json:**
-    - `PromptListType`, `PromptList`, `ConstrainPromptList`, `PromptsFolder`, `PromptSetFolder`, `SupportedPromptExtensions`, `PromptSeparator`, `CascadeOverride` and more.
-  - Supports prompt versioning, chaining, and multi-format (Markdown, YAML, Jinja, etc).
+  - **Fluent API:** Easily load prompts from folders/files, combine/chains prompts, and apply configuration in a readable style:
+```csharp 
+
+            var ctx = await PromptContext
+                .FromFolder()
+                .WithConfig(config)
+                .LoadAsync();
+
+            string combined = ctx.Get("Sales").CombineWithRoot().AsString();
+```
+  - Configurable via `appsettings.json`
+  - Supports prompt versioning (use Git versioned files), chaining, and multi-format (Markdown, YAML, Jinja, etc).
 
 ---
 
@@ -51,9 +54,9 @@ Prompts are served from the `Prompts/` directory (or as configured in `appsettin
 
 Set the `GH_TOKEN` environment variable to your LLM provider API key (e.g., Azure OpenAI):
 
-- Windows (cmd): set GH_TOKEN=your_api_key
-- Windows (PowerShell):$env:GH_TOKEN="your_api_key"
-- Linux / macOS: export GH_TOKEN=your_api_key
+- **Windows (cmd):** set GH_TOKEN=your_api_key
+- **Windows (PowerShell):** $env:GH_TOKEN="your_api_key"
+- **Linux / macOS:** export GH_TOKEN=your_api_key
 
 ### 3. Run the Client
 
@@ -72,7 +75,10 @@ dotnet run --project McpPromptClient
 
 Prompts can be Markdown (`*.prompt.md`), plain text, YAML, Jinja, etc. Place them in the `Prompts/` or `PromptSets/` directory, or configure folders in `appsettings.json`.
 
-**Example `appsettings.json` PromptLoader section:**"PromptLoader": {
+**Example `appsettings.json` PromptLoader section:**
+
+```json
+"PromptLoader": {
   "PromptListType": "named",
   "PromptList": ["system", "instructions", "examples", "groundings", "guardrails", "output"],
   "ConstrainPromptList": true,
@@ -81,13 +87,14 @@ Prompts can be Markdown (`*.prompt.md`), plain text, YAML, Jinja, etc. Place the
   "SupportedPromptExtensions": [".txt", ".prompt", ".yml", ".jinja", ".jinja2", ".prompt.md", ".md"],
   "PromptSeparator": "\n{filename}:\n---\n",
   "CascadeOverride": true
-}- **PromptListType:** How to interpret the prompt list (named, numeric, none)
-- **PromptList:** Which prompts to load/combine
-- **ConstrainPromptList:** Only load prompts in the list
+```
+- **PromptListType:** How to interpret the prompt list: named, numeric, none.
+- **PromptList:** Specific named prompts to load/combine
+- **ConstrainPromptList:** Boolean. Only load prompts in the list
 - **PromptSetFolder/PromptsFolder:** Where to find prompt sets/files
 - **SupportedPromptExtensions:** File types to load
 - **PromptSeparator:** How to join prompts when combining
-- **CascadeOverride:** Whether deeper folders override root prompts
+- **CascadeOverride:** Whether deeper folders override root prompts by same name (e.g., system prompts)
 
 ---
 

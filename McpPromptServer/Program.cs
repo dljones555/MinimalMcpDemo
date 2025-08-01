@@ -10,8 +10,9 @@ var config = new ConfigurationBuilder()
     .AddEnvironmentVariables()
     .Build();
 
-var promptContext = new PromptContext().WithConfig(config);
-await promptContext.LoadAsync();
+// Get prompts folder and load available prompts based on config rules
+
+var promptContext = await new PromptContext().WithConfig(config).LoadAsync();
 
 var builder = WebApplication.CreateBuilder(args);
 
