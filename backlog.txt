@@ -1,25 +1,29 @@
-The real POC / MVP
-- Full life cycle prompt ops w/ evals & non-engineers
-- Testing by non-engineers w/ prompt evaluation
-- Prompt chaining where one is tweeked: instructions, examples, output formats
-Versioning
-Use PromptLoader in C#
-Use a roots json file
-Implement in python
-HTTP prompt sources
-- langchain hub
-- github
-- github models
-- azure promptflow (or whichever product)
-- aws converse
-- promptlayer
-- etc
-- must prioritize
-Support S3 bucket
-Support Azure Blog storage
-Spike MCP resources
-Spike MCP roots
-MCP prompt requestparams
-Prompt templates
-Prompt functions
+- [ ] **Prompt Loader & Organization** - Load, organize, and chain prompts by folder ("roots") for modular, reusable prompt sets (e.g., sales, customer service).
+- [ ] **Prompt Evaluation & Testing** - Enable non-engineers to test and evaluate prompts, supporting prompt lifecycle and quality.
+- [ ] **Prompt Versioning** - Track and manage prompt versions for audit, rollback, and improvement.
+- [ ] **Prompt Templates & Functions** - Support parameterized prompt templates and prompt functions for dynamic LLM workflows.
+- [ ] **Prompt Chaining** - Allow prompts to be composed or chained (e.g., instructions, examples, output formats) for advanced scenarios.
+- [ ] **MCP Roots & Resources** - Expose prompt sets as MCP resources/roots for discoverability and filtering.
+- [ ] **MCP RequestParams Root Support** - Add root support to MCPClient requestparams (submit PR to Microsoft).
+- [ ] **HTTP Prompt Sources** - Load prompts from external sources (LangChain Hub, GitHub, Azure PromptFlow, AWS Converse, PromptLayer, etc.).
+- [ ] **Cloud Storage Support** - Load prompts from S3 buckets and Azure Blob Storage for enterprise-scale ops.
+- [ ] **Security & Auth** - Implement OAuth/OIDC for secure prompt operations and access control.
+- [ ] **Prompt Source Prioritization** - Allow prioritization and fallback between multiple prompt sources.
+- [ ] **Python Implementation** - Provide a Python version for cross-ecosystem adoption and demos.
+- [ ] **Ensure MCP Spec Compliance** - Ensure all features comply with the MCP spec for compatibility and interoperability.
+---
+
+**High Value Features (for monetization, sponsorship, or skill showcase):**
+- Prompt Loader & Organization
+- Prompt Evaluation & Testing
+- Prompt Versioning
+- Prompt Templates & Functions
+- Prompt Chaining
+- MCP Roots & Resources
+- Security & Auth
+- HTTP/Cloud Prompt Sources
+
+---
+
+*Each item is a feature. Check when complete. Short text describes the value for users and sponsors.*
 
