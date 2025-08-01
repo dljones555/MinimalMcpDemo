@@ -48,35 +48,10 @@ ValueTask<ListPromptsResult> ListPromptsHandler(RequestContext<ListPromptsReques
 
 async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromptRequestParams> context, CancellationToken cancellationToken)
 {
-    // Parse name as set/subset/prompt or set/prompt or prompt
+    // Use fluent PromptContext API for elegant prompt retrieval
     var name = context.Params?.Name ?? "";
-    var parts = name.Split('/', StringSplitOptions.RemoveEmptyEntries);
-    string? set = null, subset = null, promptKey = null;
-    if (parts.Length == 1) 
-    { 
-        promptKey = parts[0]; 
-        subset = "Root"; 
-        set = "Root"; 
-    }
-    else if (parts.Length == 2) 
-    { 
-        set = parts[0]; 
-        promptKey = parts[1]; 
-        subset = "Root"; 
-    }
-    else if (parts.Length == 3)
-    { 
-        set = parts[0]; 
-        subset = parts[1]; 
-        promptKey = parts[2]; 
-    }
-    else 
-    { 
-        throw new FileNotFoundException($"Prompt not found: {name}"); 
-    }
-    if (!promptContext.PromptSets.TryGetValue(set!, out var subsets) ||
-        !subsets.TryGetValue(subset!, out var promptSet) ||
-        !promptSet.Prompts.TryGetValue(promptKey!, out var prompt))
+    var promptString = promptContext.Get(name).AsString();
+    if (string.IsNullOrWhiteSpace(promptString))
         throw new FileNotFoundException($"Prompt not found: {name}");
     return new GetPromptResult
     {
@@ -85,7 +60,7 @@ async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromptReques
             new PromptMessage
             {
                 Role = Role.Assistant,
-                Content = new TextContentBlock { Text = prompt.Text.Trim() }
+                Content = new TextContentBlock { Text = promptString.Trim() }
             }
         }
     };
