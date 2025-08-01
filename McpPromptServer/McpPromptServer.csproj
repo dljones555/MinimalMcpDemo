@@ -25,4 +25,8 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PromptLoader\PromptLoader.csproj" />
+  </ItemGroup>
+
 </Project>
