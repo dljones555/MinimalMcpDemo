@@ -22,10 +22,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromptLoader.Tests", "Promp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prompts", "Prompts", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
+		prompt101.prompt.yml = prompt101.prompt.yml
 		prompt_test.prompt.yml = prompt_test.prompt.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PromptsSubdir", "PromptsSubdir", "{8AE00B42-1E99-48A8-B3EB-CF6CC18DB01E}"
+	ProjectSection(SolutionItems) = preProject
+		prompt201.prompt.yml = prompt201.prompt.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
