@@ -1,6 +1,0 @@
-messages:
-  - role: system
-    content: you are the system prompt hidden that has secret sauce
-  - role: user
-    content: can you dig it?
-model: openai/gpt-4o

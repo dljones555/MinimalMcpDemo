@@ -1,8 +1,0 @@
-messages:
-  - role: system
-    content: You are the mother of all prompts.
-  - role: user
-    content: >-
-      How many 3 oz in-n-out hamburger patties does it take to make a quarter
-      pounder?
-model: openai/gpt-4o
