@@ -1,0 +1,6 @@
+messages:
+  - role: system
+    content: you are the prompt the changes the world
+  - role: user
+    content: how many bats can fit in a bellfry?
+model: openai/gpt-4o
