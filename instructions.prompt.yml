@@ -1,0 +1,6 @@
+messages:
+  - role: system
+    content: Run the show.
+  - role: user
+    content: Will AI make me smarter and richer?
+model: openai/gpt-4o
