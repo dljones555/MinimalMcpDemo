@@ -20,17 +20,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromptLoader", "PromptLoade
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PromptLoader.Tests", "PromptLoader.Tests\PromptLoader.Tests.csproj", "{35C6C67B-984F-3647-1468-7E9E4127A49E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prompts", "Prompts", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-	ProjectSection(SolutionItems) = preProject
-		prompt101.prompt.yml = prompt101.prompt.yml
-		prompt_test.prompt.yml = prompt_test.prompt.yml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PromptsSubdir", "PromptsSubdir", "{8AE00B42-1E99-48A8-B3EB-CF6CC18DB01E}"
-	ProjectSection(SolutionItems) = preProject
-		prompt201.prompt.yml = prompt201.prompt.yml
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,9 +81,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{8AE00B42-1E99-48A8-B3EB-CF6CC18DB01E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6B99A9B2-9D72-49AE-9FB8-978732F65FB9}
