@@ -27,3 +27,26 @@
 
 *Each item is a feature. Check when complete. Short text describes the value for users and sponsors.*
 
+Notes
+
+
+8/2/2025
+
+- Code "shows idea" but is still vibe coded, not ideal code but decent 
+- Client root filtering
+- Copilot did not honor refactor request to use MCP Prompt class though this might move it away from supporting
+other prompt formats if we really want to do that
+
+- Demo would be show on Github models with "non engineering" user. Save prompt. 
+- git pull locally - have app use new prompt or git API pull new version 
+- MCP has notification feature
+- Workflow still engineering like. Should require a feature branch and PR
+
+	- Tested Github Models ability to save prompt.yml to a folder a repo
+	- Found UI confusing. Shows /Prompts as prefix as if existing folder. I did not initially have this folder.
+	- It put in root folder.
+	- You can fully qualify a path like /Prompts/CustomerService/Prompt1.prompt.yml - it will save to existing or create new folder
+	- It is case sensitive
+	- Tied to .prompt.yml format
+
+Implementation "demonstrates" idea
