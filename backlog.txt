@@ -32,7 +32,7 @@ Notes
 
 8/2/2025
 
-- Code "shows idea" but is still vibe coded poorly
+- Code "shows idea" but is still vibe coded, not ideal code but decent 
 - Client root filtering
 - Copilot did not honor refactor request to use MCP Prompt class though this might move it away from supporting
 other prompt formats if we really want to do that
