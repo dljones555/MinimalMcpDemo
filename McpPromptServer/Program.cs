@@ -2,6 +2,8 @@ using ModelContextProtocol.Protocol;
 using ModelContextProtocol.Server;
 using PromptLoader.Fluent;
 using Microsoft.Extensions.Configuration;
+using System.Text.RegularExpressions;
+using System.Text.Json;
 
 const string PromptsDirectory = "Prompts";
 
@@ -36,10 +38,25 @@ ValueTask<ListPromptsResult> ListPromptsHandler(RequestContext<ListPromptsReques
         {
             foreach (var promptKvp in subset.Value.Prompts)
             {
+                // Get the prompt text
+                var promptText = promptKvp.Value.Text;
+                // Find all placeholders in the format {argument}
+                var matches = Regex.Matches(promptText, "\\{(\\w+)\\}");
+                var arguments = matches
+                    .Cast<Match>()
+                    .Select(m => new PromptArgument {
+                        Name = m.Groups[1].Value,
+                        Required = true,
+                        Title = m.Groups[1].Value,
+                        Description = $"Parameter for {m.Groups[1].Value}" // Add Description property
+                    })
+                    .DistinctBy(a => a.Name)
+                    .ToList();
                 prompts.Add(new Prompt
                 {
                     Name = (set.Key == "Root" ? "" : set.Key + "/") + (subset.Key == "Root" ? "" : subset.Key + "/") + promptKvp.Key,
-                    Description = $"Prompt from set {set.Key}, subset {subset.Key}, file {promptKvp.Key}"
+                    Description = $"Prompt from set {set.Key}, subset {subset.Key}, file {promptKvp.Key}",
+                    Arguments = arguments.Count > 0 ? arguments : null
                 });
             }
         }
@@ -54,13 +71,41 @@ async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromptReques
     var promptString = promptContext.Get(name).AsString();
     if (string.IsNullOrWhiteSpace(promptString))
         throw new FileNotFoundException($"Prompt not found: {name}");
+
+    // Argument replacement logic
+    var arguments = context.Params?.Arguments;
+    if (arguments != null && arguments.Count > 0)
+    {
+        // Replace {argument} placeholders with provided values
+        promptString = Regex.Replace(
+            promptString,
+            "\\{(\\w+)\\}",
+            m =>
+            {
+                var key = m.Groups[1].Value;
+                if (arguments.TryGetValue(key, out var value))
+                {
+                    // Handle JsonElement extraction
+                    if (value.ValueKind == JsonValueKind.String)
+                        return value.GetString() ?? "";
+                    else if (value.ValueKind == JsonValueKind.Number)
+                        return value.GetRawText();
+                    else if (value.ValueKind == JsonValueKind.True || value.ValueKind == JsonValueKind.False)
+                        return value.GetRawText();
+                    else
+                        return value.ToString();
+                }
+                return m.Value;
+            });
+    }
+
     return new GetPromptResult
     {
         Messages = new[]
         {
             new PromptMessage
             {
-                Role = Role.Assistant,
+                Role = Role.User,
                 Content = new TextContentBlock { Text = promptString.Trim() }
             }
         }
