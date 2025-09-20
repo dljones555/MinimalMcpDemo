@@ -26,6 +26,34 @@ builder.Services.AddMcpServer()
 
 var app = builder.Build();
 app.MapMcp();
+
+app.Use(async (context, next) =>
+{
+    // Log request body
+    context.Request.EnableBuffering();
+    var requestReader = new StreamReader(context.Request.Body);
+    var requestBody = await requestReader.ReadToEndAsync();
+    context.Request.Body.Position = 0;
+    Console.WriteLine($"Request: {requestBody}");
+
+    // Buffer response
+    var originalBodyStream = context.Response.Body;
+    using var responseBody = new MemoryStream();
+    context.Response.Body = responseBody;
+
+    await next();
+
+    // Read and log response body
+    responseBody.Seek(0, SeekOrigin.Begin);
+    var responseText = await new StreamReader(responseBody).ReadToEndAsync();
+    responseBody.Seek(0, SeekOrigin.Begin);
+    Console.WriteLine($"Response: {responseText}");
+
+    // Copy response back to original stream
+    await responseBody.CopyToAsync(originalBodyStream);
+    context.Response.Body = originalBodyStream;
+});
+
 app.Run();
 
 ValueTask<ListPromptsResult> ListPromptsHandler(RequestContext<ListPromptsRequestParams> context, CancellationToken cancellationToken)
