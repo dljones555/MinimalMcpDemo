@@ -1,3 +1,16 @@
+
+
+9/21/2025
+
+I thought MCP supported argument / parameter inference or 
+this was how tools are used at least that values can be filled in by LLM.
+Noting quick test. 
+In Copilot chat, I typed in something like price: $42.30 and quantity: 3
+I thought it might infer these as parameters to the MCP prompt template based on required parameters.
+But it did not.
+Tried this on prompt template.
+
+
 - [ ] **Prompt Loader & Organization** - Load, organize, and chain prompts by folder ("roots") for modular, reusable prompt sets (e.g., sales, customer service).
 - [ ] **Prompt Evaluation & Testing** - Enable non-engineers to test and evaluate prompts, supporting prompt lifecycle and quality.
 - [ ] **Prompt Versioning** - Track and manage prompt versions for audit, rollback, and improvement.
