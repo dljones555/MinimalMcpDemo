@@ -123,7 +123,7 @@ async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromptReques
                     var key = m.Groups[1].Value;
                     if (arguments.TryGetValue(key, out var value))
                     {
-                        return value.GetRawText();
+                        return value.GetString() ?? "";
                     }
                     return m.Value;
                 });
