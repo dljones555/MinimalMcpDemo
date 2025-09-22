@@ -4,6 +4,7 @@ using PromptLoader.Fluent;
 using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
 using System.Text.Json;
+using McpPromptServer;
 
 const string PromptsDirectory = "Prompts";
 
@@ -94,50 +95,56 @@ ValueTask<ListPromptsResult> ListPromptsHandler(RequestContext<ListPromptsReques
 
 async ValueTask<GetPromptResult> GetPromptHandler(RequestContext<GetPromptRequestParams> context, CancellationToken cancellationToken)
 {
-    // Use fluent PromptContext API for elegant prompt retrieval
     var name = context.Params?.Name ?? "";
     var promptString = promptContext.Get(name).AsString();
     if (string.IsNullOrWhiteSpace(promptString))
-        throw new FileNotFoundException($"Prompt not found: {name}");
+        throw new JsonRpcException(McpErrorCode.InvalidParams, $"Invalid prompt name: {name}");
 
     // Argument replacement logic
     var arguments = context.Params?.Arguments;
-    if (arguments != null && arguments.Count > 0)
-    {
-        // Replace {argument} placeholders with provided values
-        promptString = Regex.Replace(
-            promptString,
-            "\\{(\\w+)\\}",
-            m =>
-            {
-                var key = m.Groups[1].Value;
-                if (arguments.TryGetValue(key, out var value))
-                {
-                    // Handle JsonElement extraction
-                    if (value.ValueKind == JsonValueKind.String)
-                        return value.GetString() ?? "";
-                    else if (value.ValueKind == JsonValueKind.Number)
-                        return value.GetRawText();
-                    else if (value.ValueKind == JsonValueKind.True || value.ValueKind == JsonValueKind.False)
-                        return value.GetRawText();
-                    else
-                        return value.ToString();
-                }
-                return m.Value;
-            });
-    }
+    var requiredArgs = Regex.Matches(promptString, "\\{(\\w+)\\}")
+        .Cast<Match>()
+        .Select(m => m.Groups[1].Value)
+        .Distinct()
+        .ToList();
 
-    return new GetPromptResult
+    if (requiredArgs.Any() && (arguments == null || requiredArgs.Any(arg => !arguments.ContainsKey(arg))))
+        throw new JsonRpcException(McpErrorCode.InvalidParams, $"Missing required arguments: {string.Join(", ", requiredArgs.Where(arg => arguments == null || !arguments.ContainsKey(arg)))}");
+
+    try
     {
-        Messages = new[]
+        if (arguments != null && arguments.Count > 0)
         {
-            new PromptMessage
-            {
-                Role = Role.User,
-                Content = new TextContentBlock { Text = promptString.Trim() }
-            }
+            promptString = Regex.Replace(
+                promptString,
+                "\\{(\\w+)\\}",
+                m =>
+                {
+                    var key = m.Groups[1].Value;
+                    if (arguments.TryGetValue(key, out var value))
+                    {
+                        return value.GetRawText();
+                    }
+                    return m.Value;
+                });
         }
-    };
+
+        return new GetPromptResult
+        {
+            Messages = new[]
+            {
+                new PromptMessage
+                {
+                    Role = Role.User,
+                    Content = new TextContentBlock { Text = promptString.Trim() }
+                }
+            }
+        };
+    }
+    catch (Exception ex)
+    {
+        throw new JsonRpcException(McpErrorCode.InternalError, $"Internal error: {ex.Message}");
+    }
 }
 
 ValueTask<ListResourcesResult> ListResourcesHandler(RequestContext<ListResourcesRequestParams> context, CancellationToken cancellationToken)
